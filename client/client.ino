@@ -59,6 +59,7 @@ void loop() {
     if (GPSReadBuffer.startsWith("$GPRMC")) {
       GPSReadBuffer += char('\n');
       HC12.print(GPSReadBuffer);
+      Serial.print(GPSReadBuffer);
     }
 
     GPSReadBuffer = "";
