@@ -13,21 +13,20 @@ boolean GPSEnd = false;                             // Flag for End of GPS Strin
 void setup() {
 
   SerialReadBuffer.reserve(255);                     // Reserve 82 bytes for message
-  GPSReadBuffer.reserve(82);                        // Reserve 82 bytes for longest NMEA sentence
+  GPSReadBuffer.reserve(82);                         // Reserve 82 bytes for longest NMEA sentence
 
   delay(80);
 
   Serial.begin(9600);
   HC12.begin(9600);
   gps.begin(9600);
-  HC12.write("initializing...");
+  HC12.write("initializing...\n");
 
   delay(80);
 
 }
 
 void loop() {
-
 
   while (gps.available()) {
     char filter = gps.read();
@@ -54,20 +53,23 @@ void loop() {
 
 
 
+
   if (GPSEnd) {
+
     if (GPSReadBuffer.startsWith("$GPRMC")) {
       GPSReadBuffer += char('\n');
       HC12.print(GPSReadBuffer);
     }
 
-    GPSReadBuffer = "";                           // Delete target GPS sentence
+    GPSReadBuffer = "";
     GPSEnd = false;                                 // Reset GPS
 
     if (serialEnd) {
-      HC12.print(SerialReadBuffer);                  // Sends local GPS to remote
-      SerialReadBuffer = "";                           // Delete target GPS sentence
-      serialEnd = false;                                 // Reset GPS
+      HC12.print(SerialReadBuffer);
+      SerialReadBuffer = "";
+      serialEnd = false;
     }
+
   }
 
 
