@@ -1,7 +1,17 @@
-# Importing Libraries
 import serial
+import platform
 
-arduino = serial.Serial(port='COM3', baudrate=9600, timeout=100)
+CURRENT_PLATFORM = platform.system()
+SERIAL_PORT = ''
+
+if (CURRENT_PLATFORM == 'Linux'):
+    SERIAL_PORT = '/dev/ttyUSB0'
+elif (CURRENT_PLATFORM == 'Windows'):
+    SERIAL_PORT = 'COM3'
+
+
+arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=100)
+
 def write(x):
     arduino.write(bytes(x+'\n', 'utf-8'))
 def readFromSerial():
@@ -12,5 +22,5 @@ def readFromSerial():
 injection = input("Send code to Arduino Client: ")
 value = write(injection)
 while(True):
-    readGPS = readFromSerial()
+    readGPS = str(readFromSerial())
     print(readGPS)
