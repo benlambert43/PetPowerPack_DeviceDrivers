@@ -12,7 +12,7 @@ boolean GPSEnd = false;                             // Flag for End of GPS Strin
 
 void setup() {
 
-  SerialReadBuffer.reserve(255);                     // Reserve 82 bytes for message
+  SerialReadBuffer.reserve(64999);                     // Reserve 82 bytes for message
   GPSReadBuffer.reserve(82);                         // Reserve 82 bytes for longest NMEA sentence
 
   delay(80);
