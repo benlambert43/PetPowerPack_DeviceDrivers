@@ -3,9 +3,14 @@
 SoftwareSerial HC12(10, 11); // HC-12 TX Pin, HC-12 RX Pin
 
 void setup() {
+
   Serial.begin(9600);             // Serial port to computer
   HC12.begin(9600);               // Serial port to HC12
-} 
+  delay(80);
+  Serial.write("STARTING SERVER\n");
+  delay(80);
+
+}
 
 void loop() {
   while (HC12.available()) {        // If HC-12 has data

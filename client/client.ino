@@ -20,8 +20,10 @@ void setup() {
   Serial.begin(9600);
   HC12.begin(9600);
   gps.begin(9600);
-  HC12.write("initializing...\n");
+  HC12.write("Handshake sent to server...\n");
 
+  delay(80);
+  Serial.write("STARTING CLIENT\n");
   delay(80);
 
 }
