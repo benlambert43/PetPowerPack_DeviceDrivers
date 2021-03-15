@@ -10,7 +10,7 @@ elif (CURRENT_PLATFORM == 'Windows'):
     SERIAL_PORT = 'COM3'
 
 
-f = open('SRoutput.txt', 'wb')
+f = open('SRoutput.txt', 'a')
 
 
 
@@ -32,4 +32,4 @@ def readFromSerial():
 # value = write(injection)
 while(True):
     print(str(readFromSerial()))
-    f.write(readFromSerial())
+    f.write(str(readFromSerial()))

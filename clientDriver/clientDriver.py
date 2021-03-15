@@ -33,6 +33,7 @@ def readFromSerial():
 
 # injection = input("Send code to Arduino Client: ")
 # value = write(injection)
+i = 0;
 while(True):
     # Capture the video frame 
     # by frame 
@@ -42,14 +43,14 @@ while(True):
     jpg_as_text = base64.b64encode(buffer)
 
 
-    f.write(jpg_as_text)
-    arduino.write(jpg_as_text)
-    print("Sent to Server")
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'): 
-        break
+    #f.write(jpg_as_text)
 
-    time.sleep(30)
+    gpsCoords = readFromSerial();
+    write("PointNumber: " + str(i) + " GPS: " + str(gpsCoords) + " IMG: ")
+    
+
+    i = i+1
+    time.sleep(3)
     
 
 vid.release() 
