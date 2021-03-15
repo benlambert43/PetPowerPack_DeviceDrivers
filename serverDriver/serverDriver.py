@@ -30,6 +30,11 @@ def readFromSerial():
 
 # injection = input("Send code to Arduino Client: ")
 # value = write(injection)
-while(True):
-    print(str(readFromSerial()))
-    f.write(str(readFromSerial()))
+    
+
+try:
+    while True:
+        f.write("\n <!>" + str(readFromSerial()) + "<?>\n")
+except KeyboardInterrupt:
+    f.close()
+    exit()

@@ -46,13 +46,12 @@ while(True):
     #f.write(jpg_as_text)
 
     gpsCoords = readFromSerial();
-    write("PointNumber: " + str(i) + " GPS: " + str(gpsCoords) + " IMG: ")
+    imgString = str(jpg_as_text)
+    print(i)
+    write("PointNumber: " + str(i) + " GPS: " + str(gpsCoords) + " IMG Length: " + str(len(imgString))) 
     
 
     i = i+1
     time.sleep(3)
     
 
-vid.release() 
-cv2.destroyAllWindows() 
-f.close()

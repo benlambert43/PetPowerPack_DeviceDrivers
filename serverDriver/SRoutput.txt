@@ -1,0 +1,36 @@
+
+ <!>b'STARTING SERVER\n'<?>
+
+ <!>b"PointNumber: 22 GPS: b'$GPRMC,212248.00,A,4044.36961,N,07440.68837,W,2.341,,150321,,,A*67\\n' IMG Length: 124827\n"<?>
+
+ <!>b"PointNumber: 23 GPS: b'$GPRMC,212250.00,A,4044.37163,N,07440.68892,W,0.659,,150321,,,A*64\\n' IMG Length: 127343\n"<?>
+
+ <!>b"PointNumber: 24 GPS: b'$GPRMC,212251.00,A,4044.37126,N,07440.68912,W,1.272,,150321,,,A*61\\n' IMG Length: 127011\n"<?>
+
+ <!>b"PointNumber: 25 GPS: b'$GPRMC,212252.00,A,4044.37239,N,07440.68998,W,0.816,,150321,,,A*64\\n' IMG Length: 127611\n"<?>
+
+ <!>b"PointNumber: 26 GPS: b'$GPRMC,212253.00,A,4044.37255,N,07440.69052,W,1.265,,150321,,,A*6E\\n' IMG Length: 127635\n"<?>
+
+ <!>b"PointNumber: 27 GPS: b'$GPRMC,212254.00,A,4044.37289,N,07440.69152,W,1.900,,150321,,,A*61\\n' IMG Length: 127995\n"<?>
+
+ <!>b"PointNumber: 28 GPS: b'$GPRMC,212255.00,A,4044.37404,N,07440.69093,W,1.030,,150321,,,A*65\\n' IMG Length: 126931\n"<?>
+
+ <!>b'Handshake sent to server...\n'<?>
+
+ <!>b"PointNumber: 0 GPS: b'STARTING CLIENT\\n' IMG Length: 127191\n"<?>
+
+ <!>b"PointNumber: 1 GPS: b'$GPRMC,212408.00,A,4044.39069,N,07440.68281,W,1.799,,150321,,,A*6E\\n' IMG Length: 126635\n"<?>
+
+ <!>b"PointNumber: 2 GPS: b'$GPRMC,212409.00,A,4044.39146,N,07440.68239,W,1.228,,150321,,,A*6F\\n' IMG Length: 127047\n"<?>
+
+ <!>b"PointNumber: 3 GPS: b'$GPRMC,212410.00,A,4044.39173,N,07440.68241,W,0.985,,150321,,,A*63\\n' IMG Length: 127007\n"<?>
+
+ <!>b"PointNumber: 4 GPS: b'$GPRMC,212412.00,A,4044.39114,N,07440.68289,W,1.186,,150321,,,A*6E\\n' IMG Length: 126991\n"<?>
+
+ <!>b"PointNumber: 5 GPS: b'$GPRMC,212413.00,A,4044.39104,N,07440.68305,W,1.168,,150321,,,A*6B\\n' IMG Length: 127263\n"<?>
+
+ <!>b"PointNumber: 6 GPS: b'$GPRMC,212414.00,A,4044.39029,N,07440.68196,W,1.473,,150321,,,A*65\\n' IMG Length: 127227\n"<?>
+
+ <!>b"PointNumber: 7 GPS: b'$GPRMC,212415.00,A,4044.39007,N,07440.68185,W,1.274,,150321,,,A*6B\\n' IMG Length: 127063\n"<?>
+
+ <!>b"PointNumber: 8 GPS: b'$GPRMC,212416.00,A,4044.39024,N,07440.68096,W,1.080,,150321,,,A*63\\n' IMG Length: 126979\n"<?>
