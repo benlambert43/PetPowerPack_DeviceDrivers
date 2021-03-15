@@ -1,8 +1,15 @@
 import serial
 import platform
+import cv2
+import base64
+import time
 
 CURRENT_PLATFORM = platform.system()
 SERIAL_PORT = ''
+vid = cv2.VideoCapture(0) 
+f = open('CLoutput.txt', 'wb')
+
+
 
 if (CURRENT_PLATFORM == 'Linux'):
     SERIAL_PORT = '/dev/ttyUSB0'
@@ -24,8 +31,27 @@ def readFromSerial():
     return line
 
 
-injection = input("Send code to Arduino Client: ")
-value = write(injection)
+# injection = input("Send code to Arduino Client: ")
+# value = write(injection)
 while(True):
-    readGPS = str(readFromSerial())
-    print(readGPS)
+    # Capture the video frame 
+    # by frame 
+    ret, frame = vid.read() 
+  
+    retval, buffer = cv2.imencode('.jpg', frame)
+    jpg_as_text = base64.b64encode(buffer)
+
+
+    f.write(jpg_as_text)
+    arduino.write(jpg_as_text)
+    print("Sent to Server")
+    
+    if cv2.waitKey(1) & 0xFF == ord('q'): 
+        break
+
+    time.sleep(30)
+    
+
+vid.release() 
+cv2.destroyAllWindows() 
+f.close()
