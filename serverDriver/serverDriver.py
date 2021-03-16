@@ -10,31 +10,21 @@ elif (CURRENT_PLATFORM == 'Windows'):
     SERIAL_PORT = 'COM3'
 
 
-f = open('SRoutput.txt', 'a')
+f = open('SRoutput.txt', 'wb')
 
 
 
 arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=100)
 
-def write(x):
-    try:
-        arduino.write(bytes(x+'\n', 'utf-8'))
-        return True
-    except:
-        return False
 
-def readFromSerial():
-    line = arduino.readline()
-    return line
-
-
-# injection = input("Send code to Arduino Client: ")
-# value = write(injection)
-    
-
+i = 0
 try:
     while True:
-        f.write("\n <!>" + str(readFromSerial()) + "<?>\n")
+        print("Receiving data packet " + str(i))
+        f.write(arduino.readline())
+        i = i+1
+
 except KeyboardInterrupt:
+    print("Saving and closing...")
     f.close()
     exit()
