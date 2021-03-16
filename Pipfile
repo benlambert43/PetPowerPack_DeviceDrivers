@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 requests = "*"
 pyserial = "*"
+mysql-connector-python = "*"
 
 [dev-packages]
 pylint = "*"

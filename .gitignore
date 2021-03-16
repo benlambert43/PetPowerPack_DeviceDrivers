@@ -1,0 +1,3 @@
+dbEnvConnectors.py
+*.pyc
+__pycache__

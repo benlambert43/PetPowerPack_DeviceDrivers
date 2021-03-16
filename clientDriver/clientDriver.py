@@ -33,8 +33,7 @@ def readFromSerial():
     return line
 
 
-# injection = input("Send code to Arduino Client: ")
-# value = write(injection)
+
 i = 0;
 while(True):
 
