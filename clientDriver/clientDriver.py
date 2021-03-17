@@ -59,7 +59,7 @@ while(True):
 
 
     gpsCoords = readFromSerial();
-    imgString = str(jpg_as_text)
+    imgString = jpg_as_text.decode('utf-8')
     print(i)
     write("PointNumber: " + str(i) + " GPS: " + str(gpsCoords) + " IMG Length: " + str(len(imgString)))
     time.sleep(1)
@@ -70,18 +70,19 @@ while(True):
 
         if (imgSegmentOffset + 512 > len(imgString)):
             terminatingString = imgString[imgSegmentOffset: len(imgString)]
-            write(terminatingString)
+            terminatingStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " packetData: " + terminatingString
+            write(terminatingStringPayload)
             time.sleep(1.5)
-            print(terminatingString)
-            packets = packets + 1
+            print(terminatingStringPayload)
             print("Finished sending image with " + str(packets) + " packets.")
             break;
 
         else:
             partialImgString = imgString[imgSegmentOffset: imgSegmentOffset + 512]
-            write(partialImgString)
+            partialImgStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " packetData: " + partialImgString
+            write(partialImgStringPayload)
             time.sleep(1.5)
-            print(partialImgString)
+            print(partialImgStringPayload)
             imgSegmentOffset = imgSegmentOffset + 512
             packets = packets + 1
 
