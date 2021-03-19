@@ -20,21 +20,34 @@ elif (CURRENT_PLATFORM == 'Windows'):
     SERIAL_PORT = 'COM4'
 
 
-arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=100)
 
 def write(x):
+    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=5)
+    time.sleep(3)
+
+    
     try:
-        time.sleep(1)
+        
         arduino.write(bytes(x+'\n', 'utf-8'))
         time.sleep(1)
-        arduino.write(bytes('\n', 'utf-8'))
+        arduino.close()
         time.sleep(1)
         return True
     except:
+        arduino.close()
+        time.sleep(1)
         return False
 
 def readFromSerial():
+    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=5)
+    time.sleep(3)
+    
     line = arduino.readline()
+    
+
+    time.sleep(1)
+    arduino.close()
+    time.sleep(1)
     return line
 
 
@@ -44,13 +57,11 @@ i = 0;
 print("Starting Client...")
 
 while(True):
-    time.sleep(3)
-
     ret, frame = camera.read() 
     cv2.imwrite('capture.jpg', frame)
 
     image = Image.open('capture.jpg')
-    image.thumbnail((120, 120))
+    image.thumbnail((40, 40))
     image.save('opt1.jpg')
 
 
@@ -81,20 +92,20 @@ while(True):
         continue;
 
 
-    time.sleep(1)
+    
     write("PointNumber: " + str(i) + " GPS: " + gpsCoords)
-    time.sleep(1)
+    
 
     write("PointNumber: " + str(i) + " IMG Length: " + str(len(imgString)))
-    time.sleep(1)
+    
 
     write("PointNumber: " + str(i) + " Expected Packets: " + str(math.ceil(len(imgString) / 512)))
-    time.sleep(1)
+    
 
     gpsT = time.localtime()
     gpsCurrentTime = time.strftime("%m-%d-%Y %H:%M:%S", gpsT)
     write("PointNumber: " + str(i) + " Time: " + str(gpsCurrentTime))
-    time.sleep(1)
+    
 
     imgSegmentOffset = 0
     packets = 0
@@ -106,16 +117,16 @@ while(True):
             terminatingString = imgString[imgSegmentOffset: len(imgString)]
             terminatingStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " currentTime: " + str(currentTime) + " packetData: " + terminatingString
             write(terminatingStringPayload)
-            time.sleep(3)
+            
             # print(terminatingStringPayload)
             # print("Finished sending image with " + str(packets) + " packets.")
-            time.sleep(3)
+            
             break;
         else:
             partialImgString = imgString[imgSegmentOffset: imgSegmentOffset + 512]
             partialImgStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets)  + " currentTime: " + str(currentTime) +  " packetData: " + partialImgString
             write(partialImgStringPayload)
-            time.sleep(3)
+            
             # print(partialImgStringPayload)
             imgSegmentOffset = imgSegmentOffset + 512
             packets = packets + 1

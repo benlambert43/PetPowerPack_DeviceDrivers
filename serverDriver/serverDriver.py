@@ -2,6 +2,9 @@ import serial
 import platform
 import dbEnvConnectors
 import mysql.connector
+import pathlib
+import base64
+from datetime import date, datetime
 
 # Environment Variables
 CURRENT_PLATFORM = platform.system()
@@ -32,7 +35,9 @@ mycursor = mydbconnection1.cursor()
 
 
 # Find out if the petpowerpackserverdb already exists on the server.
-# If it doesn't, create it.
+# If it doesn't, drop it and create it again.
+# The database only contains data for the current session, more permanent data will be stored on a seperate database.
+
 mycursor.execute("SHOW DATABASES")
 dbArray = []
 for x in mycursor:
@@ -49,7 +54,11 @@ if (not(alreadyContainsDB)):
     create_db_query = "CREATE DATABASE PetPowerPackServerDB"
     mycursor.execute(create_db_query)
 else:
-    print("PetPowerPackServerDB already exists. Skipping creation and connecting instead.")
+    deletequery = "DROP DATABASE petpowerpackserverdb"
+    mycursor.execute(deletequery)
+    create_db_query = "CREATE DATABASE PetPowerPackServerDB"
+    mycursor.execute(create_db_query)
+    print("Refreshing and connecting.")
 mydbconnection1.commit()
 mycursor.close()
 mydbconnection1.close()
@@ -75,7 +84,11 @@ mysqlCmdCursor.close()
 mydb.close()
 
 i = 0
+completeImagePackets = 0
+imageBuffer = ""
 print("Connected to db on localhost.")
+
+
 try:
     while True:
         lineFromHC12 = arduino.readline()
@@ -121,23 +134,35 @@ try:
 
 
                 imageNumber = str(packetDataStr[imgNumEnd: imgPackNumStart]).strip()
-                print(imageNumber)
+                #print(imageNumber)
 
                 imagePacketNumber = str(packetDataStr[imgPackNumEnd: imgCurrTimeStart]).strip()
-                print(imagePacketNumber)
+                #print(imagePacketNumber)
+
 
                 currentTime = str(packetDataStr[imgCurrTimeEnd: onlyImageStartIndex]).strip()
-                print(currentTime)
+                #print(currentTime)
                 
-                f.write(packetData)
+                #f.write(packetData)
+                imageBuffer = imageBuffer + packetData.strip()
+
+                if ((int(imagePacketNumber)+1) == int(completeImagePackets)):
+                    dt_string = datetime.now().strftime("%m-%d-%Y %H-%M-%S")
+
+
+                    print("Entire image complete.")
+                    pathToIMG = str(pathlib.Path().absolute()) + "\\imageCache\\" + str(dt_string.strip()) + ".jpg"
+                    print(pathToIMG)
+                    with open(pathToIMG, "wb") as fh:
+                        fh.write(base64.b64decode(imageBuffer))
+                    imageBuffer = ""
                 
                 
                 imgcursor.execute("INSERT INTO petpowerpackserverdb.image (imageNumber, imagePacketNumber, packetData, pointAssoc, packetTimeStamp) VALUES(%s, %s, %s, %s, %s);", (int(imageNumber),int(imagePacketNumber),packetData,int(imageNumber),currentTime))
-
-                
                 dbIMG.commit()
                 imgcursor.close()
                 dbIMG.close()
+
 
             if (lineFromHC12.decode("utf-8").startswith("PointNumber")):
                 lineFromHC12Str = lineFromHC12.decode('utf-8')
@@ -159,7 +184,7 @@ try:
                     lineFromHC12Str = lineFromHC12Str.strip()
                     pointNumForGPS = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("GPS: ")].strip()
                     finalGPSstr = lineFromHC12Str[lineFromHC12Str.rfind(" GPS: ") + len(" GPS: "): len(lineFromHC12Str)].strip()
-                    print("GPS STRING FOR " + pointNumForGPS + " : " + finalGPSstr)
+                    #print("GPS STRING FOR " + pointNumForGPS + " : " + finalGPSstr)
                     cursor.execute("INSERT INTO petpowerpackserverdb.gps (gpsPointNumber, gpsCoords, gpsImageLength, gpsExpectedPackets, gpsTime) VALUES(%s, %s, NULL, NULL, NULL);", (pointNumForGPS, finalGPSstr))
                     db.commit()
 
@@ -167,7 +192,7 @@ try:
                     lineFromHC12Str = lineFromHC12Str.strip()
                     pointNumForImgLen = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("IMG Length: ")].strip()
                     finalImgLenstr = lineFromHC12Str[lineFromHC12Str.rfind(" IMG Length: ") + len(" IMG Length: "): len(lineFromHC12Str)].strip()
-                    print("ImgLen STRING FOR " + pointNumForImgLen + " : " + finalImgLenstr)
+                    #print("ImgLen STRING FOR " + pointNumForImgLen + " : " + finalImgLenstr)
                     cursor.execute("UPDATE petpowerpackserverdb.gps SET gpsImageLength=%s WHERE gpsPointNumber=%s;",(finalImgLenstr, pointNumForImgLen))
                     db.commit()
 
@@ -175,15 +200,16 @@ try:
                     lineFromHC12Str = lineFromHC12Str.strip()
                     pointNumForExpectedPackets = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("Expected Packets: ")].strip()
                     finalExpectedPacketsstr = lineFromHC12Str[lineFromHC12Str.rfind(" Expected Packets: ") + len(" Expected Packets: "): len(lineFromHC12Str)].strip()
-                    print("ExpectedPackets STRING FOR " + pointNumForExpectedPackets + " : " + finalExpectedPacketsstr)
+                    #print("ExpectedPackets STRING FOR " + pointNumForExpectedPackets + " : " + finalExpectedPacketsstr)
                     cursor.execute("UPDATE petpowerpackserverdb.gps SET gpsExpectedPackets=%s WHERE gpsPointNumber=%s;",(finalExpectedPacketsstr, pointNumForExpectedPackets))
+                    completeImagePackets = int(finalExpectedPacketsstr)
                     db.commit()
 
                 if lineFromHC12Str.__contains__("Time:"):
                     lineFromHC12Str = lineFromHC12Str.strip()
                     pointNumForTime = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("Time: ")].strip()
                     finalTimestr = lineFromHC12Str[lineFromHC12Str.rfind(" Time: ") + len(" Time: "): len(lineFromHC12Str)].strip()
-                    print("Time STRING FOR " + pointNumForTime + " : " + finalTimestr)
+                    #print("Time STRING FOR " + pointNumForTime + " : " + finalTimestr)
                     cursor.execute("UPDATE petpowerpackserverdb.gps SET gpsTime=%s WHERE gpsPointNumber=%s;",(finalTimestr, pointNumForTime))
                     db.commit()
                 

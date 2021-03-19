@@ -20,9 +20,6 @@ void setup() {
   Serial.begin(9600);
   HC12.begin(9600);
   gps.begin(9600);
-
-  delay(80);
-  Serial.write("STARTING CLIENT\n");
   delay(80);
 
 }
@@ -59,7 +56,6 @@ void loop() {
 
     if (GPSReadBuffer.startsWith("$GPRMC")) {
       GPSReadBuffer += char('\n');
-      //HC12.print(GPSReadBuffer);
       Serial.print(GPSReadBuffer);
     }
 
