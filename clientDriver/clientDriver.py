@@ -61,14 +61,10 @@ while(True):
     cv2.imwrite('capture.jpg', frame)
 
     image = Image.open('capture.jpg')
-    image.thumbnail((40, 40))
+    image.thumbnail((240, 240))
     image.save('opt1.jpg')
 
-
-    optimizedImage1 = Image.open('opt1.jpg')
-    optimizedImage1.save("opt2.jpg",optimize=True,quality=95)
-
-    optimizedImage2 = Image.open('opt2.jpg')
+    optimizedImage2 = Image.open('opt1.jpg')
 
     output = io.BytesIO()
     optimizedImage2.save(output, format="jpeg")
