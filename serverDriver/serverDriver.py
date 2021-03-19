@@ -20,7 +20,7 @@ f = open('SRoutput.txt', 'w')
 arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=100)
 
 # Connect to the local MySQL DB
-print("checking for database on " + dbEnvConnectors.getDB().host)
+print("Checking for database on " + dbEnvConnectors.getDB().host + "...")
 mydbconnection1 = mysql.connector.connect(
   host=dbEnvConnectors.getDB().host,
   user=dbEnvConnectors.getDB().user,
@@ -51,10 +51,11 @@ if (not(alreadyContainsDB)):
 else:
     print("PetPowerPackServerDB already exists. Skipping creation and connecting instead.")
 mydbconnection1.commit()
+mycursor.close()
 mydbconnection1.close()
 
 
-print("connecting to db on " + dbEnvConnectors.getDB().host)
+print("Connecting to db on " + dbEnvConnectors.getDB().host + "...")
 mydb = mysql.connector.connect(
   host=dbEnvConnectors.getDB().host,
   user=dbEnvConnectors.getDB().user,
@@ -63,32 +64,135 @@ mydb = mysql.connector.connect(
 )
 
 mysqlCmdCursor = mydb.cursor()
-createTableCommand = 'CREATE TABLE IF NOT EXISTS `image` ( `imageID` bigint unsigned NOT NULL AUTO_INCREMENT, `imageNumber` bigint unsigned NOT NULL, `imagePacketNumber` bigint unsigned NOT NULL, `packetData` varchar(2048) DEFAULT NULL, `pointAssoc` bigint unsigned NOT NULL, PRIMARY KEY (`imageID`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci'
-mysqlCmdCursor.execute(createTableCommand)
-mydb.commit()
 
+createTableCommandGPS = 'CREATE TABLE IF NOT EXISTS `gps` (`gpsPointNumber` bigint unsigned NOT NULL, `gpsCoords` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL, `gpsImageLength` int DEFAULT NULL, `gpsExpectedPackets` int DEFAULT NULL, `gpsTime` varchar(255) DEFAULT NULL, PRIMARY KEY (`gpsPointNumber`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci'
+mysqlCmdCursor.execute(createTableCommandGPS)
+
+createTableCommandImage = 'CREATE TABLE IF NOT EXISTS `image` ( `imageID` bigint unsigned NOT NULL AUTO_INCREMENT, `imageNumber` bigint unsigned NOT NULL, `imagePacketNumber` bigint unsigned NOT NULL, `packetData` varchar(2048) DEFAULT NULL, `pointAssoc` bigint unsigned NOT NULL, `packetTimeStamp` varchar(100) DEFAULT NULL, PRIMARY KEY (`imageID`), KEY `image_FK` (`pointAssoc`), CONSTRAINT `image_FK` FOREIGN KEY (`pointAssoc`) REFERENCES `gps` (`gpsPointNumber`) ON DELETE CASCADE ON UPDATE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci'
+mysqlCmdCursor.execute(createTableCommandImage)
+mydb.commit() 
+mysqlCmdCursor.close()
+mydb.close()
 
 i = 0
+print("Connected to db on localhost.")
 try:
     while True:
         lineFromHC12 = arduino.readline()
-        print("Receiving data packet " + str(i))
-        if (lineFromHC12.decode("utf-8").startswith("imageNumber")):
-            packetDataStr = lineFromHC12.decode("utf-8")
-            onlyImageStartIndex = packetDataStr.rfind("packetData:") + (len("packetData: "))
-            onlyImageEndIndex = len(packetDataStr)
-            
-            packetData=packetDataStr[onlyImageStartIndex: onlyImageEndIndex]
-            imageNumber = 0;
-            imagePacketNumber = 0;
-            pointAssoc = 0;
+        try:
 
-            f.write(packetData)
+            if (lineFromHC12.decode("utf-8").startswith("imageNumber")):
 
-        if (lineFromHC12.decode("utf-8").startswith("PointNumber")):
-            print(lineFromHC12)
+                dbIMG = mysql.connector.connect(
+                    host=dbEnvConnectors.getDB().host,
+                    user=dbEnvConnectors.getDB().user,
+                    password=dbEnvConnectors.getDB().password,
+                    database="petpowerpackserverdb"
+                )
+                imgcursor = dbIMG.cursor()
+                
 
-        i = i+1
+                # DATA FORMAT:
+                # "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets)  + " currentTime: " + str(currentTime) +  " packetData: " + partialImgString
+
+
+                # packetData:
+                packetDataStr = lineFromHC12.decode("utf-8")
+                onlyImageStartIndex = packetDataStr.rfind("packetData:")
+                onlyImageEndIndex = len(packetDataStr)
+                packetData=packetDataStr[(onlyImageStartIndex  + (len("packetData: "))): onlyImageEndIndex]
+
+                # imageNumber:
+                imageNumber = "";
+                imgNumStart = packetDataStr.rfind("imageNumber: ")
+                imgNumEnd = imgNumStart + len("imageNumber: ")
+
+                # imagePacketNumber:
+                imagePacketNumber = "";
+                packetDataStr.rfind("imagePacketNumber: ")
+                imgPackNumStart = packetDataStr.rfind("imagePacketNumber: ")
+                imgPackNumEnd = imgPackNumStart + len("imagePacketNumber: ")
+
+                # currentTime
+                currentTime = "";
+                packetDataStr.rfind("currentTime: ")
+                imgCurrTimeStart = packetDataStr.rfind("currentTime: ")
+                imgCurrTimeEnd = imgCurrTimeStart + len("currentTime: ")
+
+
+                imageNumber = str(packetDataStr[imgNumEnd: imgPackNumStart]).strip()
+                print(imageNumber)
+
+                imagePacketNumber = str(packetDataStr[imgPackNumEnd: imgCurrTimeStart]).strip()
+                print(imagePacketNumber)
+
+                currentTime = str(packetDataStr[imgCurrTimeEnd: onlyImageStartIndex]).strip()
+                print(currentTime)
+                
+                f.write(packetData)
+                
+                
+                imgcursor.execute("INSERT INTO petpowerpackserverdb.image (imageNumber, imagePacketNumber, packetData, pointAssoc, packetTimeStamp) VALUES(%s, %s, %s, %s, %s);", (int(imageNumber),int(imagePacketNumber),packetData,int(imageNumber),currentTime))
+
+                
+                dbIMG.commit()
+                imgcursor.close()
+                dbIMG.close()
+
+            if (lineFromHC12.decode("utf-8").startswith("PointNumber")):
+                lineFromHC12Str = lineFromHC12.decode('utf-8')
+
+                # write("PointNumber: " + str(i) + " GPS: " + gpsCoords)
+                # write("PointNumber: " + str(i) + " IMG Length: " + str(len(imgString)))
+                # write("PointNumber: " + str(i) + " Expected Packets: " + str(math.ceil(len(imgString) / 512)))
+                # write("PointNumber: " + str(i) + " Time: " + str(gpsCurrentTime))
+
+                db = mysql.connector.connect(
+                    host=dbEnvConnectors.getDB().host,
+                    user=dbEnvConnectors.getDB().user,
+                    password=dbEnvConnectors.getDB().password,
+                    database="petpowerpackserverdb"
+                )
+                cursor = db.cursor()
+
+                if lineFromHC12Str.__contains__("GPS:"):
+                    lineFromHC12Str = lineFromHC12Str.strip()
+                    pointNumForGPS = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("GPS: ")].strip()
+                    finalGPSstr = lineFromHC12Str[lineFromHC12Str.rfind(" GPS: ") + len(" GPS: "): len(lineFromHC12Str)].strip()
+                    print("GPS STRING FOR " + pointNumForGPS + " : " + finalGPSstr)
+                    cursor.execute("INSERT INTO petpowerpackserverdb.gps (gpsPointNumber, gpsCoords, gpsImageLength, gpsExpectedPackets, gpsTime) VALUES(%s, %s, NULL, NULL, NULL);", (pointNumForGPS, finalGPSstr))
+                    db.commit()
+
+                if lineFromHC12Str.__contains__("IMG Length:"):
+                    lineFromHC12Str = lineFromHC12Str.strip()
+                    pointNumForImgLen = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("IMG Length: ")].strip()
+                    finalImgLenstr = lineFromHC12Str[lineFromHC12Str.rfind(" IMG Length: ") + len(" IMG Length: "): len(lineFromHC12Str)].strip()
+                    print("ImgLen STRING FOR " + pointNumForImgLen + " : " + finalImgLenstr)
+                    cursor.execute("UPDATE petpowerpackserverdb.gps SET gpsImageLength=%s WHERE gpsPointNumber=%s;",(finalImgLenstr, pointNumForImgLen))
+                    db.commit()
+
+                if lineFromHC12Str.__contains__("Expected Packets:"):
+                    lineFromHC12Str = lineFromHC12Str.strip()
+                    pointNumForExpectedPackets = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("Expected Packets: ")].strip()
+                    finalExpectedPacketsstr = lineFromHC12Str[lineFromHC12Str.rfind(" Expected Packets: ") + len(" Expected Packets: "): len(lineFromHC12Str)].strip()
+                    print("ExpectedPackets STRING FOR " + pointNumForExpectedPackets + " : " + finalExpectedPacketsstr)
+                    cursor.execute("UPDATE petpowerpackserverdb.gps SET gpsExpectedPackets=%s WHERE gpsPointNumber=%s;",(finalExpectedPacketsstr, pointNumForExpectedPackets))
+                    db.commit()
+
+                if lineFromHC12Str.__contains__("Time:"):
+                    lineFromHC12Str = lineFromHC12Str.strip()
+                    pointNumForTime = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("Time: ")].strip()
+                    finalTimestr = lineFromHC12Str[lineFromHC12Str.rfind(" Time: ") + len(" Time: "): len(lineFromHC12Str)].strip()
+                    print("Time STRING FOR " + pointNumForTime + " : " + finalTimestr)
+                    cursor.execute("UPDATE petpowerpackserverdb.gps SET gpsTime=%s WHERE gpsPointNumber=%s;",(finalTimestr, pointNumForTime))
+                    db.commit()
+                
+                cursor.close()
+                db.close()
+
+
+        except:
+            continue
 
 except KeyboardInterrupt:
     print("Saving and closing...")

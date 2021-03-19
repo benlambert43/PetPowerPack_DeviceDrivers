@@ -5,6 +5,7 @@ import base64
 import time
 from PIL import Image
 import io
+import math
 
 
 CURRENT_PLATFORM = platform.system()
@@ -23,7 +24,11 @@ arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=100)
 
 def write(x):
     try:
+        time.sleep(1)
         arduino.write(bytes(x+'\n', 'utf-8'))
+        time.sleep(1)
+        arduino.write(bytes('\n', 'utf-8'))
+        time.sleep(1)
         return True
     except:
         return False
@@ -35,13 +40,17 @@ def readFromSerial():
 
 
 i = 0;
+
+print("Starting Client...")
+
 while(True):
+    time.sleep(3)
 
     ret, frame = camera.read() 
     cv2.imwrite('capture.jpg', frame)
 
     image = Image.open('capture.jpg')
-    image.thumbnail((256, 256))
+    image.thumbnail((120, 120))
     image.save('opt1.jpg')
 
 
@@ -60,29 +69,54 @@ while(True):
 
     gpsCoords = readFromSerial();
     imgString = jpg_as_text.decode('utf-8')
-    print(i)
-    write("PointNumber: " + str(i) + " GPS: " + str(gpsCoords) + " IMG Length: " + str(len(imgString)))
+    try:
+        gpsCoords = gpsCoords.decode('utf-8')
+
+        # on bootup it displays starting client in serial. We want to ignore this and read the next line which contains GPS data.
+        if "STARTING CLIENT" in gpsCoords:
+            print(gpsCoords)
+            gpsCoords = readFromSerial();
+            gpsCoords = gpsCoords.decode('utf-8')
+    except:
+        continue;
+
+
+    time.sleep(1)
+    write("PointNumber: " + str(i) + " GPS: " + gpsCoords)
+    time.sleep(1)
+
+    write("PointNumber: " + str(i) + " IMG Length: " + str(len(imgString)))
+    time.sleep(1)
+
+    write("PointNumber: " + str(i) + " Expected Packets: " + str(math.ceil(len(imgString) / 512)))
+    time.sleep(1)
+
+    gpsT = time.localtime()
+    gpsCurrentTime = time.strftime("%m-%d-%Y %H:%M:%S", gpsT)
+    write("PointNumber: " + str(i) + " Time: " + str(gpsCurrentTime))
     time.sleep(1)
 
     imgSegmentOffset = 0
     packets = 0
     while (True):
+        t = time.localtime()
+        currentTime = time.strftime("%m/%d/%Y %H:%M:%S", t)
 
         if (imgSegmentOffset + 512 > len(imgString)):
             terminatingString = imgString[imgSegmentOffset: len(imgString)]
-            terminatingStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " packetData: " + terminatingString
+            terminatingStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " currentTime: " + str(currentTime) + " packetData: " + terminatingString
             write(terminatingStringPayload)
-            time.sleep(1.5)
-            print(terminatingStringPayload)
-            print("Finished sending image with " + str(packets) + " packets.")
+            time.sleep(3)
+            # print(terminatingStringPayload)
+            # print("Finished sending image with " + str(packets) + " packets.")
+            time.sleep(3)
             break;
-
         else:
             partialImgString = imgString[imgSegmentOffset: imgSegmentOffset + 512]
-            partialImgStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " packetData: " + partialImgString
+            partialImgStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets)  + " currentTime: " + str(currentTime) +  " packetData: " + partialImgString
             write(partialImgStringPayload)
-            time.sleep(1.5)
-            print(partialImgStringPayload)
+            time.sleep(3)
+            # print(partialImgStringPayload)
             imgSegmentOffset = imgSegmentOffset + 512
             packets = packets + 1
 
