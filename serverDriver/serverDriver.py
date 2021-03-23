@@ -147,11 +147,8 @@ try:
                 imageBuffer = imageBuffer + packetData.strip()
 
                 if ((int(imagePacketNumber)+1) == int(completeImagePackets)):
-                    dt_string = datetime.now().strftime("%m-%d-%Y %H-%M-%S")
-
-
                     print("Entire image complete.")
-                    pathToIMG = str(pathlib.Path().absolute()) + "\\imageCache\\" + str(dt_string.strip()) + ".jpg"
+                    pathToIMG = str(pathlib.Path().absolute()) + "\\imageCache\\" + str(currentTime.strip()) + ".jpg"
                     print(pathToIMG)
                     with open(pathToIMG, "wb") as fh:
                         fh.write(base64.b64decode(imageBuffer))

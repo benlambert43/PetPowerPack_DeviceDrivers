@@ -23,7 +23,7 @@ elif (CURRENT_PLATFORM == 'Windows'):
 
 def write(x):
     arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=5)
-    time.sleep(3)
+    time.sleep(2)
 
     
     try:
@@ -40,7 +40,7 @@ def write(x):
 
 def readFromSerial():
     arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=5)
-    time.sleep(3)
+    time.sleep(2)
     
     line = arduino.readline()
     
@@ -61,7 +61,7 @@ while(True):
     cv2.imwrite('capture.jpg', frame)
 
     image = Image.open('capture.jpg')
-    image.thumbnail((240, 240))
+    image.thumbnail((120, 120))
     image.save('opt1.jpg')
 
     optimizedImage2 = Image.open('opt1.jpg')
@@ -95,11 +95,11 @@ while(True):
     write("PointNumber: " + str(i) + " IMG Length: " + str(len(imgString)))
     
 
-    write("PointNumber: " + str(i) + " Expected Packets: " + str(math.ceil(len(imgString) / 512)))
+    write("PointNumber: " + str(i) + " Expected Packets: " + str(math.ceil(len(imgString) / 750)))
     
 
     gpsT = time.localtime()
-    gpsCurrentTime = time.strftime("%m-%d-%Y %H:%M:%S", gpsT)
+    gpsCurrentTime = time.strftime("%m-%d-%Y %H-%M-%S", gpsT)
     write("PointNumber: " + str(i) + " Time: " + str(gpsCurrentTime))
     
 
@@ -107,9 +107,9 @@ while(True):
     packets = 0
     while (True):
         t = time.localtime()
-        currentTime = time.strftime("%m/%d/%Y %H:%M:%S", t)
+        currentTime = time.strftime("%m-%d-%Y %H-%M-%S", t)
 
-        if (imgSegmentOffset + 512 > len(imgString)):
+        if (imgSegmentOffset + 750 > len(imgString)):
             terminatingString = imgString[imgSegmentOffset: len(imgString)]
             terminatingStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " currentTime: " + str(currentTime) + " packetData: " + terminatingString
             write(terminatingStringPayload)
@@ -119,12 +119,12 @@ while(True):
             
             break;
         else:
-            partialImgString = imgString[imgSegmentOffset: imgSegmentOffset + 512]
+            partialImgString = imgString[imgSegmentOffset: imgSegmentOffset + 750]
             partialImgStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets)  + " currentTime: " + str(currentTime) +  " packetData: " + partialImgString
             write(partialImgStringPayload)
             
             # print(partialImgStringPayload)
-            imgSegmentOffset = imgSegmentOffset + 512
+            imgSegmentOffset = imgSegmentOffset + 750
             packets = packets + 1
 
     i = i+1
