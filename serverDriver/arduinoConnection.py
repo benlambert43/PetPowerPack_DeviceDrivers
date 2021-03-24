@@ -130,6 +130,14 @@ def arduinoEngine():
               cursor.execute("UPDATE petpowerpacksessiondata.gps SET gpsImageLength=%s WHERE gpsPointNumber=%s;",(finalImgLenstr, pointNumForImgLen))
               db.commit()
 
+          if lineFromHC12Str.__contains__("videoFeed:"):
+              lineFromHC12Str = lineFromHC12Str.strip()
+              pointNumForVideoFeed = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("videoFeed: ")].strip()
+              finalVideoFeedstr = lineFromHC12Str[lineFromHC12Str.rfind(" videoFeed: ") + len(" videoFeed: "): len(lineFromHC12Str)].strip()
+              print("VideoFeed STRING FOR " + pointNumForVideoFeed + " : " + finalVideoFeedstr)
+              cursor.execute("UPDATE petpowerpacksessiondata.gps SET gpsVideoFeed=%s WHERE gpsPointNumber=%s;",(finalVideoFeedstr, pointNumForVideoFeed))
+              db.commit()
+
           if lineFromHC12Str.__contains__("Expected Packets:"):
               lineFromHC12Str = lineFromHC12Str.strip()
               pointNumForExpectedPackets = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("Expected Packets: ")].strip()
@@ -138,6 +146,8 @@ def arduinoEngine():
               cursor.execute("UPDATE petpowerpacksessiondata.gps SET gpsExpectedPackets=%s WHERE gpsPointNumber=%s;",(finalExpectedPacketsstr, pointNumForExpectedPackets))
               completeImagePackets = int(finalExpectedPacketsstr)
               db.commit()
+
+
 
           if lineFromHC12Str.__contains__("Time:"):
               lineFromHC12Str = lineFromHC12Str.strip()

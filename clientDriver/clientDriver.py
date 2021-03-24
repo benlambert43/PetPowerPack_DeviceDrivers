@@ -67,6 +67,7 @@ if __name__ == "__main__":
     t1.daemon = True
     t1.start()
 
+    online.onlineVideoFeed(camera)
 
     # keep daemon threads alive
     while True:

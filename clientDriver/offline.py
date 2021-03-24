@@ -4,14 +4,27 @@ import io
 import base64
 import math
 import time
+import socket
 
+
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 
 def offlineThread(write, readFromSerial, camera, detectInternet):
 
   i = 0;
-  print("Starting Client...")
-
+  print("[T1]: Offline Thread Running:")
 
   while(True):
 
@@ -27,6 +40,7 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
     optimizedImage2.save(output, format="jpeg")
     jpg_as_text = base64.b64encode(output.getvalue()) 
     imgString = jpg_as_text.decode('utf-8')
+    ipAddr = get_ip()
 
 
     gpsCoords = readFromSerial();
@@ -51,6 +65,9 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
     gpsT = time.localtime()
     gpsCurrentTime = time.strftime("%m-%d-%Y %H-%M-%S", gpsT)
     write("PointNumber: " + str(i) + " Time: " + str(gpsCurrentTime))
+    write("PointNumber: " + str(i) + " videoFeed: " + str(ipAddr + ':8089/video_feed'))
+
+
     
 
     imgSegmentOffset = 0
