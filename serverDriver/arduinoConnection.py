@@ -71,7 +71,7 @@ def arduinoEngine():
 
 
           imageNumber = str(packetDataStr[imgNumEnd: imgPackNumStart]).strip()
-          print(imageNumber)
+          #print(imageNumber)
 
           imagePacketNumber = str(packetDataStr[imgPackNumEnd: imgCurrTimeStart]).strip()
           #print(imagePacketNumber)
@@ -84,9 +84,9 @@ def arduinoEngine():
           imageBuffer = imageBuffer + packetData.strip()
 
           if ((int(imagePacketNumber)+1) == int(completeImagePackets)):
-              print("Entire image complete.")
+              # print("Entire image complete.")
               pathToIMG = str(pathlib.Path().absolute()) + "\\imageCache\\" + str(currentTime.strip()) + ".jpg"
-              print(pathToIMG)
+              # print(pathToIMG)
               with open(pathToIMG, "wb") as fh:
                   fh.write(base64.b64decode(imageBuffer))
               imageBuffer = ""
@@ -118,7 +118,7 @@ def arduinoEngine():
               lineFromHC12Str = lineFromHC12Str.strip()
               pointNumForGPS = lineFromHC12Str[lineFromHC12Str.rfind("PointNumber: ") + len("PointNumber: "): lineFromHC12Str.rfind("GPS: ")].strip()
               finalGPSstr = lineFromHC12Str[lineFromHC12Str.rfind(" GPS: ") + len(" GPS: "): len(lineFromHC12Str)].strip()
-              print("GPS STRING FOR " + pointNumForGPS + " : " + finalGPSstr)
+              #print("GPS STRING FOR " + pointNumForGPS + " : " + finalGPSstr)
               cursor.execute("INSERT INTO petpowerpacksessiondata.gps (gpsPointNumber, gpsCoords, gpsImageLength, gpsExpectedPackets, gpsTime) VALUES(%s, %s, NULL, NULL, NULL);", (pointNumForGPS, finalGPSstr))
               db.commit()
 

@@ -1,11 +1,11 @@
 import serial
 import platform
 import cv2
-import base64
 import time
-from PIL import Image
-import io
-import math
+import online
+import offline
+import threading
+import http.client as httplib
 
 
 CURRENT_PLATFORM = platform.system()
@@ -19,6 +19,15 @@ if (CURRENT_PLATFORM == 'Linux'):
 elif (CURRENT_PLATFORM == 'Windows'):
     SERIAL_PORT = 'COM4'
 
+def detectInternet():
+    conn = httplib.HTTPConnection("www.google.com", timeout=5)
+    try:
+        conn.request("HEAD", "/")
+        conn.close()
+        return True
+    except:
+        conn.close()
+        return False
 
 
 def write(x):
@@ -52,80 +61,18 @@ def readFromSerial():
 
 
 
-i = 0;
+if __name__ == "__main__":
+    # creating thread
+    t1 = threading.Thread(target=offline.offlineThread, args=(write, readFromSerial, camera, detectInternet,))
+    t1.daemon = True
+    t1.start()
 
-print("Starting Client...")
 
-while(True):
-    ret, frame = camera.read() 
-    cv2.imwrite('capture.jpg', frame)
-
-    image = Image.open('capture.jpg')
-    image.thumbnail((120, 120))
-    image.save('opt1.jpg')
-
-    optimizedImage2 = Image.open('opt1.jpg')
-
-    output = io.BytesIO()
-    optimizedImage2.save(output, format="jpeg")
-    image_as_string = base64.b64encode(output.getvalue()) 
-
-    jpg_as_text = image_as_string
+    # keep daemon threads alive
+    while True:
+        time.sleep(1)
 
 
 
-    gpsCoords = readFromSerial();
-    imgString = jpg_as_text.decode('utf-8')
-    try:
-        gpsCoords = gpsCoords.decode('utf-8')
 
-        # on bootup it displays starting client in serial. We want to ignore this and read the next line which contains GPS data.
-        if "STARTING CLIENT" in gpsCoords:
-            print(gpsCoords)
-            gpsCoords = readFromSerial();
-            gpsCoords = gpsCoords.decode('utf-8')
-    except:
-        continue;
-
-
-    
-    write("PointNumber: " + str(i) + " GPS: " + gpsCoords)
-    
-
-    write("PointNumber: " + str(i) + " IMG Length: " + str(len(imgString)))
-    
-
-    write("PointNumber: " + str(i) + " Expected Packets: " + str(math.ceil(len(imgString) / 750)))
-    
-
-    gpsT = time.localtime()
-    gpsCurrentTime = time.strftime("%m-%d-%Y %H-%M-%S", gpsT)
-    write("PointNumber: " + str(i) + " Time: " + str(gpsCurrentTime))
-    
-
-    imgSegmentOffset = 0
-    packets = 0
-    while (True):
-        t = time.localtime()
-        currentTime = time.strftime("%m-%d-%Y %H-%M-%S", t)
-
-        if (imgSegmentOffset + 750 > len(imgString)):
-            terminatingString = imgString[imgSegmentOffset: len(imgString)]
-            terminatingStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets) + " currentTime: " + str(currentTime) + " packetData: " + terminatingString
-            write(terminatingStringPayload)
-            
-            # print(terminatingStringPayload)
-            # print("Finished sending image with " + str(packets) + " packets.")
-            
-            break;
-        else:
-            partialImgString = imgString[imgSegmentOffset: imgSegmentOffset + 750]
-            partialImgStringPayload = "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets)  + " currentTime: " + str(currentTime) +  " packetData: " + partialImgString
-            write(partialImgStringPayload)
-            
-            # print(partialImgStringPayload)
-            imgSegmentOffset = imgSegmentOffset + 750
-            packets = packets + 1
-
-    i = i+1
 
