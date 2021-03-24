@@ -25,7 +25,6 @@ def get_ip():
 def offlineThread(write, readFromSerial, camera, detectInternet):
   dt = datetime.now()
   i = int(dt.strftime("%Y%m%d%H%M%S"))
-  print(i)
 
   print("[T1]: Offline Thread Running:")
 
@@ -80,7 +79,7 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
 
     if (not(detectInternet())):
 
-      print("No Internet.")
+      # print("No Internet.")
 
       while (True):
         t = time.localtime()
@@ -110,7 +109,7 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
   
 
     else:
-      print("Internet detected, skipping.")
+      # print("Internet detected, skipping.")
       dt = datetime.now()
       i = int(dt.strftime("%Y%m%d%H%M%S"))
       time.sleep(1)
