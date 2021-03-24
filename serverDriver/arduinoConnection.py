@@ -23,14 +23,14 @@ def arduinoEngine():
 
   # Connect to Arduino over serial port
   arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=100)
-
-
-  i = 0
   completeImagePackets = 0
   imageBuffer = ""
 
   while True:
     lineFromHC12 = arduino.readline()
+
+
+
     if (lineFromHC12.decode("utf-8").startswith("imageNumber")):
 
           dbIMG = mysql.connector.connect(
@@ -41,11 +41,6 @@ def arduinoEngine():
           )
           imgcursor = dbIMG.cursor()
           
-
-          # DATA FORMAT:
-          # "imageNumber: " + str(i) + " imagePacketNumber: " + str(packets)  + " currentTime: " + str(currentTime) +  " packetData: " + partialImgString
-
-
           # packetData:
           packetDataStr = lineFromHC12.decode("utf-8")
           onlyImageStartIndex = packetDataStr.rfind("packetData:")
@@ -101,11 +96,6 @@ def arduinoEngine():
     if (lineFromHC12.decode("utf-8").startswith("PointNumber")):
           lineFromHC12Str = lineFromHC12.decode('utf-8')
 
-          # write("PointNumber: " + str(i) + " GPS: " + gpsCoords)
-          # write("PointNumber: " + str(i) + " IMG Length: " + str(len(imgString)))
-          # write("PointNumber: " + str(i) + " Expected Packets: " + str(math.ceil(len(imgString) / 512)))
-          # write("PointNumber: " + str(i) + " Time: " + str(gpsCurrentTime))
-
           db = mysql.connector.connect(
               host=dbEnvConnectors.getDB().host,
               user=dbEnvConnectors.getDB().user,
@@ -146,8 +136,6 @@ def arduinoEngine():
               cursor.execute("UPDATE petpowerpacksessiondata.gps SET gpsExpectedPackets=%s WHERE gpsPointNumber=%s;",(finalExpectedPacketsstr, pointNumForExpectedPackets))
               completeImagePackets = int(finalExpectedPacketsstr)
               db.commit()
-
-
 
           if lineFromHC12Str.__contains__("Time:"):
               lineFromHC12Str = lineFromHC12Str.strip()

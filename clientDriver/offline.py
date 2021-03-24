@@ -5,6 +5,7 @@ import base64
 import math
 import time
 import socket
+from datetime import datetime
 
 
 
@@ -22,8 +23,10 @@ def get_ip():
 
 
 def offlineThread(write, readFromSerial, camera, detectInternet):
+  dt = datetime.now()
+  i = int(dt.strftime("%Y%m%d%H%M%S"))
+  print(i)
 
-  i = 0;
   print("[T1]: Offline Thread Running:")
 
   while(True):
@@ -101,12 +104,14 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
             imgSegmentOffset = imgSegmentOffset + 750
             packets = packets + 1
         
-      i = i+1
+      dt = datetime.now()
+      i = int(dt.strftime("%Y%m%d%H%M%S"))
 
   
 
     else:
       print("Internet detected, skipping.")
-      i = i+1
+      dt = datetime.now()
+      i = int(dt.strftime("%Y%m%d%H%M%S"))
       time.sleep(1)
       continue

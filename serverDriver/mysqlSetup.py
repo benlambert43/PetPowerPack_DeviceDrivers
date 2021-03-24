@@ -35,10 +35,6 @@ def mysqlinitsetup():
       create_db_query = "CREATE DATABASE petpowerpacksessiondata"
       mycursor.execute(create_db_query)
   else:
-      deletequery = "DROP DATABASE petpowerpacksessiondata"
-      mycursor.execute(deletequery)
-      create_db_query = "CREATE DATABASE petpowerpacksessiondata"
-      mycursor.execute(create_db_query)
       print("Refreshing and connecting.")
   mydbconnection1.commit()
   mycursor.close()
