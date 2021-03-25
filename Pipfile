@@ -7,9 +7,12 @@ name = "pypi"
 requests = "*"
 pyserial = "*"
 mysql-connector-python = "*"
+opencv-python = "*"
+flask = "*"
+pillow = "*"
 
 [dev-packages]
 pylint = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.7"
