@@ -46,6 +46,7 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
 
 
     gpsCoords = readFromSerial();
+    print(gpsCoords)
 
 
     try:
