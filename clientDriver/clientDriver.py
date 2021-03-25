@@ -51,7 +51,7 @@ def readFromSerial():
     arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=200)
     time.sleep(3)
     
-    line = arduino.read()
+    line = arduino.readline()
     
 
     time.sleep(1)
