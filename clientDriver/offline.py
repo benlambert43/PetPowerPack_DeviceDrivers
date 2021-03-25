@@ -51,12 +51,6 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
 
     try:
         gpsCoords = gpsCoords.decode('utf-8')
-
-        # on bootup it displays starting client in serial. We want to ignore this and read the next line which contains GPS data.
-        if "STARTING CLIENT" in gpsCoords:
-            print(gpsCoords)
-            gpsCoords = readFromSerial();
-            gpsCoords = gpsCoords.decode('utf-8')
     except:
         continue;
 
