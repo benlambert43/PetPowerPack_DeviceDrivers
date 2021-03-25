@@ -7,7 +7,7 @@ name = "pypi"
 requests = "*"
 pyserial = "*"
 mysql-connector-python = "*"
-opencv-python = "*"
+opencv-contrib-python = "*"
 flask = "*"
 pillow = "*"
 
