@@ -48,10 +48,10 @@ def write(x):
         return False
 
 def readFromSerial():
-    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=1000)
-    time.sleep(10)
+    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=1)
+    time.sleep(3)
     
-    line = arduino.readline()
+    line = arduino.read()
     
 
     time.sleep(1)
