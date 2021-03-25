@@ -32,31 +32,31 @@ def detectInternet():
 
 def write(x):
     arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=5)
-    time.sleep(2)
+    time.sleep(5)
 
     
     try:
         
         arduino.write(bytes(x+'\n', 'utf-8'))
-        time.sleep(1)
+        time.sleep(3)
         arduino.close()
-        time.sleep(1)
+        time.sleep(3)
         return True
     except:
         arduino.close()
-        time.sleep(1)
+        time.sleep(3)
         return False
 
 def readFromSerial():
     arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=5)
-    time.sleep(2)
+    time.sleep(5)
     
     line = arduino.readline()
     
 
-    time.sleep(1)
+    time.sleep(3)
     arduino.close()
-    time.sleep(1)
+    time.sleep(3)
     return line
 
 
