@@ -15,7 +15,7 @@ camera = cv2.VideoCapture(0)
 
 
 if (CURRENT_PLATFORM == 'Linux'):
-    SERIAL_PORT = '/dev/ttyUSB0'
+    SERIAL_PORT = '/dev/ttyACM0'
 elif (CURRENT_PLATFORM == 'Windows'):
     SERIAL_PORT = 'COM4'
 

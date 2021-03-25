@@ -1,0 +1,32 @@
+Installing python dependencies via pipenv on RPi is a massive PitA...
+OpenCV breaks everything on RPi.
+Better to just install all dependencies manually and globally.
+
+
+Installing all dependencies:
+
+
+sudo apt-get install libhdf5-dev libhdf5-serial-dev libhdf5-103
+sudo apt-get install libqtgui4 libqtwebkit4 libqt4-test python3-pyqt5
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libjasper-dev
+sudo apt-get install python3-distutils
+
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python3 get-pip.py
+
+sudo apt install python3-pip
+sudo pip3 install unicornhat
+sudo pip install --upgrade pip
+sudo pip install --upgrade pip setuptools wheel
+sudo pip3 install requests
+sudo pip3 install pyserial
+sudo pip3 install mysql-connector-python
+sudo pip3 install flask
+sudo pip3 install pillow
+sudo pip3 install pylint
+sudo pip install opencv-contrib-python==4.1.0.25
+
+fallback (installs VERY OLD versions of opencv if the above does not work):
+sudo apt-get install python-opencv
+sudo apt-get install opencv-contrib-python
