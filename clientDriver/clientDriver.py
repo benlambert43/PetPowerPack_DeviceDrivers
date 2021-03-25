@@ -19,6 +19,9 @@ if (CURRENT_PLATFORM == 'Linux'):
 elif (CURRENT_PLATFORM == 'Windows'):
     SERIAL_PORT = 'COM4'
 
+arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=200)
+
+
 def detectInternet():
     conn = httplib.HTTPConnection("www.google.com", timeout=5)
     try:
@@ -31,34 +34,18 @@ def detectInternet():
 
 
 def write(x):
-    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=1000)
-    time.sleep(3)
-
-    
     try:
-        
-        arduino.write(bytes(x+'\n', 'utf-8'))
         time.sleep(1)
-        arduino.close()
+        arduino.write(bytes(x+'\n', 'utf-8'))
         time.sleep(1)
         return True
     except:
-        arduino.close()
         time.sleep(1)
         return False
 
 def readFromSerial():
-    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=200)
-    time.sleep(3)
-    
-    line = arduino.readline()
-    
-
     time.sleep(1)
-    arduino.flushInput()
-    arduino.flushOutput()
-    arduino.flush()
-    arduino.close()
+    line = arduino.readline()
     time.sleep(1)
     return line
 
