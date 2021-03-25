@@ -31,7 +31,7 @@ def detectInternet():
 
 
 def write(x):
-    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=5)
+    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=15)
     time.sleep(3)
 
     
@@ -48,15 +48,15 @@ def write(x):
         return False
 
 def readFromSerial():
-    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=500)
+    arduino = serial.Serial(port=SERIAL_PORT, baudrate=9600, timeout=15)
     time.sleep(5)
     
     line = arduino.readline()
     
 
-    time.sleep(3)
+    time.sleep(1)
     arduino.close()
-    time.sleep(3)
+    time.sleep(1)
     return line
 
 

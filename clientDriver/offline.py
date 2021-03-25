@@ -59,7 +59,7 @@ def offlineThread(write, readFromSerial, camera, detectInternet):
     except:
         continue;
 
-
+    print(gpsCoords)
     
     write("PointNumber: " + str(i) + " GPS: " + gpsCoords)
     write("PointNumber: " + str(i) + " IMG Length: " + str(len(imgString)))
