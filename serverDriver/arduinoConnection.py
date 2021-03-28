@@ -16,7 +16,7 @@ def arduinoEngine():
 
   # Detect which serial file reader to use
   if (CURRENT_PLATFORM == 'Linux'):
-      SERIAL_PORT = '/dev/ttyUSB0'
+      SERIAL_PORT = '/dev/ttyACM0'
   elif (CURRENT_PLATFORM == 'Windows'):
       SERIAL_PORT = 'COM3'
 
