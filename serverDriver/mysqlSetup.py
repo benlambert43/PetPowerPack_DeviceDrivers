@@ -51,10 +51,10 @@ def mysqlinitsetup():
 
   mysqlCmdCursor = mydb.cursor()
 
-  createTableCommandGPS = 'CREATE TABLE IF NOT EXISTS `gps` (`gpsPointNumber` bigint unsigned NOT NULL, `gpsCoords` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4 NOT NULL, `gpsImageLength` int DEFAULT NULL, `gpsExpectedPackets` int DEFAULT NULL, `gpsVideoFeed` varchar(255) DEFAULT NULL, `gpsTime` varchar(255) DEFAULT NULL, PRIMARY KEY (`gpsPointNumber`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4'
+  createTableCommandGPS = 'CREATE TABLE IF NOT EXISTS `gps` (`gpsPointNumber` bigint unsigned NOT NULL, `gpsCoords` varchar(2048) CHARACTER SET utf8_general_ci COLLATE utf8_general_ci NOT NULL, `gpsImageLength` int DEFAULT NULL, `gpsExpectedPackets` int DEFAULT NULL, `gpsVideoFeed` varchar(255) DEFAULT NULL, `gpsTime` varchar(255) DEFAULT NULL, PRIMARY KEY (`gpsPointNumber`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8_general_ci COLLATE=utf8_general_ci'
   mysqlCmdCursor.execute(createTableCommandGPS)
 
-  createTableCommandImage = 'CREATE TABLE IF NOT EXISTS `image` ( `imageID` bigint unsigned NOT NULL AUTO_INCREMENT, `imageNumber` bigint unsigned NOT NULL, `imagePacketNumber` bigint unsigned NOT NULL, `packetData` varchar(2048) DEFAULT NULL, `pointAssoc` bigint unsigned NOT NULL, `packetTimeStamp` varchar(100) DEFAULT NULL, PRIMARY KEY (`imageID`), KEY `image_FK` (`pointAssoc`), CONSTRAINT `image_FK` FOREIGN KEY (`pointAssoc`) REFERENCES `gps` (`gpsPointNumber`) ON DELETE CASCADE ON UPDATE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4'
+  createTableCommandImage = 'CREATE TABLE IF NOT EXISTS `image` ( `imageID` bigint unsigned NOT NULL AUTO_INCREMENT, `imageNumber` bigint unsigned NOT NULL, `imagePacketNumber` bigint unsigned NOT NULL, `packetData` varchar(2048) DEFAULT NULL, `pointAssoc` bigint unsigned NOT NULL, `packetTimeStamp` varchar(100) DEFAULT NULL, PRIMARY KEY (`imageID`), KEY `image_FK` (`pointAssoc`), CONSTRAINT `image_FK` FOREIGN KEY (`pointAssoc`) REFERENCES `gps` (`gpsPointNumber`) ON DELETE CASCADE ON UPDATE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8_general_ci COLLATE=utf8_general_ci'
   mysqlCmdCursor.execute(createTableCommandImage)
   mydb.commit() 
   mysqlCmdCursor.close()
