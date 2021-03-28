@@ -11,6 +11,7 @@ sudo apt-get install libqtgui4 libqtwebkit4 libqt4-test python3-pyqt5 -y
 sudo apt-get install libatlas-base-dev -y
 sudo apt-get install libjasper-dev -y
 sudo apt-get install python3-distutils -y
+sudo apt install mariadb-server -y
 
 wget https://bootstrap.pypa.io/get-pip.py
 sudo python3 get-pip.py
@@ -30,3 +31,8 @@ sudo pip install opencv-contrib-python==4.1.0.25
 fallback (installs VERY OLD versions of opencv if the above does not work):
 sudo apt-get install python-opencv
 sudo apt-get install opencv-contrib-python
+
+
+mysql install:
+
+sudo mysql_secure_installation
